@@ -30,7 +30,21 @@ class MomentService {
     left join users u on m.user_id = u.id
     limit ?,?
     `;
-    const [result] = await connection.execute(statement, [offset,size]);
+    const [result] = await connection.execute(statement, [offset, size]);
+    return result;
+  }
+
+  //更新动态
+  async update(content, momonentId) {
+    const statement = `update moment set content = ? where id = ?`;
+    const [result] = await connection.execute(statement, [content, momonentId]);
+    return result;
+  }
+
+  //删除动态
+  async remove(momentId) {
+    const statement = `delete from moment where id = ?`;
+    const [result] = await connection.execute(statement, [momentId]);
     return result;
   }
 }

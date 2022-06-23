@@ -10,7 +10,8 @@ const {
   detail,
   list,
   update,
-} = require("../controller/momentController");
+  remove,
+} = require("../controller/moment.controller");
 
 const momentRouter = new Router({ prefix: "/moment" });
 
@@ -22,5 +23,7 @@ momentRouter.get("/:momentId", detail);
 momentRouter.get("/", list);
 //修改动态  1.用户必须登录  2.用户是否有权限修改
 momentRouter.patch("/update/:momentId", verifyAuth, verifyPermission, update);
+//删除动态
+momentRouter.delete("/remove/:momentId", verifyAuth, verifyPermission, remove);
 
 module.exports = momentRouter;

@@ -5,6 +5,7 @@ const service = require("../service/user.service");
 const md5password = require("../utils/password-handle");
 
 const { PUBLIC_KEY } = require("../app/config");
+const authService = require("../service/auth.service");
 
 // 验证登录
 const verifyLogin = async (ctx, next) => {
@@ -39,7 +40,7 @@ const verifyLogin = async (ctx, next) => {
 const verifyAuth = async (ctx, next) => {
   console.log("验证授权的middleware");
   //获取token
-  console.log(ctx.header);
+  // console.log(ctx.header);
   const authorization = ctx.header.authorization;
   if (!authorization) {
     const error = new Error(errorType.UNAUTHORIZATION);
@@ -52,10 +53,12 @@ const verifyAuth = async (ctx, next) => {
       algorithms: ["RS256"],
     });
     ctx.user = result;
+    console.log("token验证通过");
     await next();
-  } catch (eror) {
+  } catch (err) {
+    console.log(err);
     const error = new Error(errorType.UNAUTHORIZATION);
-    ctx.app.emit("error", error, ctx);
+    return ctx.app.emit("error", error, ctx);
   }
 };
 
@@ -63,13 +66,19 @@ const verifyAuth = async (ctx, next) => {
 const verifyPermission = async (ctx, next) => {
   console.log("验证权限");
   //获取momentId
-  const momentId = ctx.params;
+  const momentId = ctx.params.momentId;
   //获取用户id
-  const { id } = ctx.request.body;
-
+  const { id } = ctx.user;
+  // console.log(momentId,id);
   //查询是否具备权限
-  
-  await next();
+  try {
+    const isPermission = await authService.checkMoment(momentId, id);
+    if (!isPermission) throw new Error();
+    await next();
+  } catch (err) {
+    const error = new Error(errorType.UNPERMISSION);
+    return ctx.app.emit("error", error, ctx);
+  }
 };
 
 module.exports = { verifyLogin, verifyAuth, verifyPermission };

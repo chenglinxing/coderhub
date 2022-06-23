@@ -6,7 +6,6 @@ class MomentController {
     const userId = ctx.user.id;
     const content = ctx.request.body.content;
     console.log(userId, content);
-    ctx.body = "11111111";
 
     //2.将数据插入到数据库中
     const result = await momentService.create(userId, content);
@@ -38,9 +37,15 @@ class MomentController {
     const momentId = ctx.params.momentId;
     // 获取动态内容
     const { content } = ctx.request.body;
-    // 获取用户id
-    const { id } = ctx.user;
-    ctx.body = "修改动态" + momentId + content + id;
+    const result = await momentService.update(content, momentId);
+    ctx.body = result;
+  }
+
+  async remove(ctx, next) {
+    //获取动态id
+    const momentId = ctx.params.momentId;
+    const result = await momentService.remove( momentId);
+    ctx.body = result;
   }
 }
 

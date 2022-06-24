@@ -62,23 +62,31 @@ const verifyAuth = async (ctx, next) => {
   }
 };
 
-//验证用户是否有权限
-const verifyPermission = async (ctx, next) => {
-  console.log("验证权限");
-  //获取momentId
-  const momentId = ctx.params.momentId;
-  //获取用户id
-  const { id } = ctx.user;
-  // console.log(momentId,id);
-  //查询是否具备权限
-  try {
-    const isPermission = await authService.checkMoment(momentId, id);
-    if (!isPermission) throw new Error();
-    await next();
-  } catch (err) {
-    const error = new Error(errorType.UNPERMISSION);
-    return ctx.app.emit("error", error, ctx);
-  }
+//验证用户是否有权限操作动态相关
+//方法一：借助闭包自定义传入tableName
+const verifyPermission = (tableName) => {
+  return async (ctx, next) => {
+    console.log("验证权限");
+    //获取momentId
+    const [resourceKey] = Object.keys(ctx.params);
+    const id = ctx.params[resourceKey];
+    //获取用户id
+    const { id: userId } = ctx.user;
+    console.log(userId,id);
+    //查询是否具备权限
+    try {
+      const isPermission = await authService.checkSource(
+        tableName,
+        id,
+        userId
+      );
+      if (!isPermission) throw new Error();
+      await next();
+    } catch (err) {
+      const error = new Error(errorType.UNPERMISSION);
+      return ctx.app.emit("error", error, ctx);
+    }
+  };
 };
 
 module.exports = { verifyLogin, verifyAuth, verifyPermission };

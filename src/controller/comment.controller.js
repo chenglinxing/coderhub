@@ -22,8 +22,22 @@ class CommentController {
   async update(ctx, next) {
     const { commentId } = ctx.params;
     const { content } = ctx.request.body;
-    console.log(commentId, content);
-    ctx.body = "修改评论" + commentId + content;
+    // console.log(commentId, content);
+    const result = await service.update(commentId, content);
+    ctx.body = result;
+  }
+
+  async remove(ctx, next) {
+    const { commentId } = ctx.params;
+    const result = await service.remove(commentId);
+    ctx.body = result;
+  }
+
+  // 获取某一个动态下面的评论列表
+  async list(ctx, next) {
+    const { momentId } = ctx.query;
+    const result = await service.getCommentByMomentId(momentId);
+    ctx.body = result;
   }
 }
 

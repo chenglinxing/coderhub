@@ -22,8 +22,8 @@ momentRouter.get("/:momentId", detail);
 //查询所有的接口 支持分页
 momentRouter.get("/", list);
 //修改动态  1.用户必须登录  2.用户是否有权限修改
-momentRouter.patch("/update/:momentId", verifyAuth, verifyPermission, update);
+momentRouter.patch("/update/:momentId", verifyAuth, verifyPermission("moment"), update);
 //删除动态
-momentRouter.delete("/remove/:momentId", verifyAuth, verifyPermission, remove);
+momentRouter.delete("/remove/:momentId", verifyAuth, verifyPermission("moment"), remove);
 
 module.exports = momentRouter;

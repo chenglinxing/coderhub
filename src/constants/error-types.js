@@ -4,6 +4,8 @@ const USER_DOES_NOT_EXISTS = "user_does_not_exists";
 const PASSWORD_IS_INCORRENT = "password_is-incurrent";
 const UNAUTHORIZATION = "unauthorization";
 const UNPERMISSION = "unpermission";
+//参数错误或参数不存在
+const PARAMETER_ERROR = "parameter does not exist or parameter error"
 
 module.exports = {
   NAME_OR_PASSWORD_IS_REQUIRED,
@@ -12,4 +14,5 @@ module.exports = {
   PASSWORD_IS_INCORRENT,
   UNAUTHORIZATION,
   UNPERMISSION,
+  PARAMETER_ERROR
 };

@@ -5,12 +5,17 @@ const {
   verifyPermission,
 } = require("../middleware/auth.middlerware");
 
+
+//检验标签是否存在
+const { verifyLabelExists} =require("../middleware/label.middleware")
 const {
   create,
   detail,
   list,
   update,
   remove,
+  addLabels,
+  fileInfo
 } = require("../controller/moment.controller");
 
 const momentRouter = new Router({ prefix: "/moment" });
@@ -25,5 +30,13 @@ momentRouter.get("/", list);
 momentRouter.patch("/update/:momentId", verifyAuth, verifyPermission("moment"), update);
 //删除动态
 momentRouter.delete("/remove/:momentId", verifyAuth, verifyPermission("moment"), remove);
+
+
+//给动态添加标签  
+momentRouter.post("/:momentId/labels",verifyAuth,verifyPermission("moment"),verifyLabelExists,addLabels)
+
+// 给动态配图  预览图片
+momentRouter.get("/images/:filename",fileInfo)
+
 
 module.exports = momentRouter;

@@ -14,9 +14,16 @@ class UserService {
 
   //查询用户
   async getUserByName(name) {
-    const statment = `select * from users where name = ?`;
-    const result = await connection.execute(statment, [name]);
+    const statement = `select * from users where name = ?`;
+    const result = await connection.execute(statement, [name]);
     return result[0];
+  }
+
+  //更新头像
+  async updateAvatarById(avatarUrl, id) {
+    const statement = `update users set avatar_url = ? where id = ?`;
+    const [result] = await connection.execute(statement, [avatarUrl, id]);
+    return result;
   }
 }
 

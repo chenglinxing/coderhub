@@ -16,6 +16,7 @@ const PUBLIC_KEY = fs.readFileSync(
 
 //导出环境变量
 module.exports = {
+  APP_HOST,
   APP_PORT,
   MYSQL_HOST,
   MYSQL_PORT,

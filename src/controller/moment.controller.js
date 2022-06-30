@@ -1,4 +1,8 @@
 const momentService = require("../service/moment.service");
+const fileService = require("../service/file.service");
+const fs = require("fs");
+
+const { PICTURE_PATH } = require("../constants/file-path");
 
 class MomentController {
   async create(ctx, next) {
@@ -44,8 +48,42 @@ class MomentController {
   async remove(ctx, next) {
     //获取动态id
     const momentId = ctx.params.momentId;
-    const result = await momentService.remove( momentId);
+    const result = await momentService.remove(momentId);
     ctx.body = result;
+  }
+
+  //给动态添加标签
+  async addLabels(ctx, next) {
+    const { labels } = ctx;
+    const { momentId } = ctx.params;
+
+    //2.添加所有的标签
+    for (let label of labels) {
+      //判断该标签与动态是否有关系
+      const isExists = await momentService.hasLabel(momentId, label.id);
+      if (!isExists) {
+        await momentService.addLabel(momentId, label.id);
+      }
+    }
+
+    ctx.body = "给动态添加标签成功！";
+  }
+
+  //给动态添加图片或文件  预览图片
+  async fileInfo(ctx, next) {
+    try {
+      let { filename } = ctx.params;
+      const fileinfo = await fileService.getFileByFileName(filename);
+      const type = ctx.query?.type;
+      const types = ["small", "middle", "large"];
+      if (types.some((i) => i === type)) {
+        filename = filename + "-" + type;
+      }
+      ctx.response.set("content-type", fileinfo.mimetype);
+      ctx.body = fs.createReadStream(`${PICTURE_PATH}/${filename}`);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 

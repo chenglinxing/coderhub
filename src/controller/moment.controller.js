@@ -3,7 +3,7 @@ const fileService = require("../service/file.service");
 const fs = require("fs");
 
 const { PICTURE_PATH } = require("../constants/file-path");
-
+const {formatDate ,isDate} = require("../utils/date")
 class MomentController {
   async create(ctx, next) {
     //1.获取用户id content
@@ -84,6 +84,18 @@ class MomentController {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  //模糊查询动态
+  async selectMoment(ctx,next){
+    let { name,beginDate,endDate } = ctx.request.body
+    //转换name 判断是否为空
+    if(name?.replace(/ /g,"") == "" || name == undefined){
+      name = ""
+    }
+    console.log(name,beginDate,endDate);
+    const result  = await momentService.selectMoment(name,beginDate,endDate)
+    ctx.body = result
   }
 }
 

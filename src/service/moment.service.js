@@ -1,5 +1,8 @@
 const connection = require("../app/database");
 
+const config = require("../app/config")
+
+const baseURL = `http://${config.APP_HOST}:${config.APP_PORT}`
 class MomentService {
   //创建动态
   async create(userId, content) {
@@ -19,7 +22,7 @@ class MomentService {
 									'user',JSON_OBJECT('id',cu.id,'name',cu.name,'avatar',cu.avatar_url))
 		) ,null) from comment c left join users cu on c.user_id = cu.id where m.id = c.moment_id)  cmoments,
 		if(count(l.id),JSON_ARRAYAGG(JSON_OBJECT('id',l.id,'name',l.name)),JSON_ARRAY()) labels,
-    (select JSON_ARRAYAGG(concat('http://localhost:8000/moment/images/',file.filename)) 
+    (select JSON_ARRAYAGG(concat('${baseURL}/moment/images/',file.filename)) 
 		from file where m.id = file.moment_id) images
     from moment m 	
     left join users u on m.user_id = u.id
@@ -43,7 +46,7 @@ class MomentService {
     JSON_OBJECT('id',u.id,'name',u.name) user,
     (select COUNT(*) from comment c where c.moment_id = m.id) commentCount,
     (select count(*) from moment_label ml where m.id = ml.moment_id) labelCount,
-    (select JSON_ARRAYAGG(concat('http://localhost:8000/moment/images/',file.filename)) 
+    (select JSON_ARRAYAGG(concat('${baseURL}/moment/images/',file.filename)) 
 		from file where m.id = file.moment_id) images
     from moment m
     left join users u on m.user_id = u.id
@@ -78,6 +81,27 @@ class MomentService {
     const statement = `insert into moment_label(moment_id,label_id) values(?,?);`;
     const [result] = await connection.execute(statement, [momentId, labelId]);
     return result;
+  }
+
+
+  async selectMoment(name,beginDate,endDate){
+    const end = endDate ?`'${endDate}'`: 'now()'
+    const statement = `
+    select m.id id,m.content content,m.createAt createTime,m.updateAt updateTime,
+    (select COUNT(*) from comment c where c.moment_id = m.id) commentCount,
+        (select count(*) from moment_label ml where m.id = ml.moment_id) labelCount,
+    (select JSON_ARRAYAGG(concat('${baseURL}/moment/images/',file.filename)) 
+        from file where m.id = file.moment_id) images,
+    JSON_OBJECT('id',u.id,'name',u.name) user
+    from moment m
+    left join users u on u.id = m.user_id
+    where m.updateAt between '${beginDate}' and ${end}
+    and u.name like '%${name}%'
+    `
+    console.log(statement)
+    const [result]  = await connection.execute(statement,[beginDate,end,name])
+    console.log(statement)
+    return result
   }
 }
 

@@ -15,7 +15,8 @@ const {
   update,
   remove,
   addLabels,
-  fileInfo
+  fileInfo,
+  selectMoment
 } = require("../controller/moment.controller");
 
 const momentRouter = new Router({ prefix: "/moment" });
@@ -38,5 +39,7 @@ momentRouter.post("/:momentId/labels",verifyAuth,verifyPermission("moment"),veri
 // 给动态配图  预览图片
 momentRouter.get("/images/:filename",fileInfo)
 
+//动态模糊查询
+momentRouter.post("/selectMoment",verifyAuth,selectMoment)
 
 module.exports = momentRouter;

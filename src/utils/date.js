@@ -1,3 +1,5 @@
+const dayjs = require("dayjs")
+
 // 获取当前日期  年月日时分秒
 function getDate() {
   let date = new Date();
@@ -15,4 +17,17 @@ function getDate() {
   return year + month + day + hour + minute + seconds;
 }
 
-module.exports = { getDate };
+function formatDate (value,format="YYYY-MM_DD",errMsg="日期格式错误"){
+  if(isDate(value)){
+    return dayjs(value).format(format)
+  }else{
+    return errMsg
+  }
+}
+
+function isDate(value){
+  return dayjs(value).isValid
+}
+
+
+module.exports = { getDate,formatDate ,isDate};
